@@ -49,3 +49,19 @@ func (r *memoryRepository) Save(a *auction.Auction) error {
 	r.auctions[a.ID()] = a
 	return nil
 }
+
+func (r *memoryRepository) Get(id uuid.UUID) (*auction.Auction, error) {
+	if id == uuid.Nil {
+		return nil, errors.New("id cannot be nil")
+	}
+
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	a, exists := r.auctions[id]
+	if !exists {
+		return nil, errors.New("auction not found")
+	}
+
+	return a, nil
+}

@@ -2,6 +2,8 @@ package auction
 
 import (
 	"errors"
+	"fmt"
+
 	"github.com/google/uuid"
 )
 
@@ -49,4 +51,17 @@ func newAuction(id uuid.UUID, productName string, minIncrement float64, starting
 
 func (a Auction) ID() uuid.UUID {
 	return a.id
+}
+
+func (a Auction) String() string {
+	return fmt.Sprintf(
+		"Auction{ID: %s, Product: %q, StartingPrice: %.2f, MinIncrement: %.2f, BuyoutPrice: %.2f, Opened: %t, Bids: %d}",
+		a.id.String(),
+		a.productName,
+		a.startingPrice,
+		a.minIncrement,
+		a.buyoutPrice,
+		a.opened,
+		len(a.bids),
+	)
 }

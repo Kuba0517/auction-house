@@ -7,6 +7,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/google/uuid"
 )
 
 func main() {
@@ -83,9 +85,20 @@ func handleClose(service *auction.Service, args []string) error {
 func handleInspect(service *auction.Service, args []string) error {
 	fs := flag.NewFlagSet("inspect", flag.ExitOnError)
 
-	//auctionId := fs.String("auction-id", "", "id of the auction to inspect")
+	auctionId := fs.String("auction-id", "", "id of the auction to inspect")
 
 	parseArgs(fs, args)
+	id, err := uuid.Parse(*auctionId)
+	if err != nil {
+		return errors.New("there was an error parsing id")
+	}
+
+	auction, err := service.HandleGet(id)
+	if err != nil {
+		return fmt.Errorf("there was an error getting auction: %w", err)
+	}
+
+	fmt.Println(auction.String())
 
 	return nil
 }

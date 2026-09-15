@@ -31,3 +31,7 @@ func (s *Service) HandleCreate(productName string, startingPrice float64, minInc
 
 	return nil
 }
+
+func (s *Service) HandleGet(id uuid.UUID) (*Auction, error) {
+	return s.repo.Get(id)
+}
