@@ -46,16 +46,16 @@ func handleCreate(service *auction.Service, args []string) error {
 	fs := flag.NewFlagSet("create", flag.ExitOnError)
 
 	productName := fs.String("product-name", "", "name of the product being auctioned")
-	startingPrice := fs.Float64("starting-price", 0.0, "initial price point")
-	minIncrement := fs.Float64("min-increment", 0.0, "minimum increment over the current highest bid")
-	buyoutPrice := fs.Float64("buyout-price", 0.0, "buyout price")
+	startingPrice := fs.Int64("starting-price", 0.0, "initial price point")
+	minIncrement := fs.Int64("min-increment", 0.0, "minimum increment over the current highest bid")
+	buyoutPrice := fs.Int64("buyout-price", 0.0, "buyout price")
 
 	parseArgs(fs, args)
 
-	id, err := service.HandleCreate(*productName, *startingPrice, *minIncrement, *buyoutPrice)
+	id, err := service.HandleCreate(*productName, auction.Money(*startingPrice), auction.Money(*minIncrement), auction.Money(*buyoutPrice))
 
 	if err != nil {
-		return fmt.Errorf("There was a problem creating an auction: %w", err)
+		return fmt.Errorf("there was a problem creating an auction: %w", err)
 	}
 
 	fmt.Println(id)
@@ -65,11 +65,21 @@ func handleCreate(service *auction.Service, args []string) error {
 func handleBid(service *auction.Service, args []string) error {
 	fs := flag.NewFlagSet("bid", flag.ExitOnError)
 
-	//auctionId := fs.String("auction-id", "", "id of the auction to bid")
-	//amount := fs.Float64("amount", 0.0, "amount of auction to bid")
+	auctionId := fs.String("auction-id", "", "id of the auction to bid")
+	amount := fs.Int64("amount", 0.0, "amount of auction to bid")
 
 	parseArgs(fs, args)
+	parsedAuctionId, err := uuid.Parse(*auctionId)
+	if err != nil {
+		return errors.New("there was an error parsing auction id")
+	}
 
+	bidId, err := service.HandleBid(parsedAuctionId, auction.Money(*amount))
+	if err != nil {
+		return fmt.Errorf("failed to place bid: %w", err)
+	}
+
+	fmt.Println(bidId)
 	return nil
 }
 

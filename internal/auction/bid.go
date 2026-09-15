@@ -7,13 +7,13 @@ import (
 	"github.com/google/uuid"
 )
 
-type bid struct {
+type Bid struct {
 	id                uuid.UUID
-	amount            float64
+	amount            Money
 	acceptedTimestamp time.Time
 }
 
-func newBid(id uuid.UUID, amount float64, acceptedTimestamp time.Time) (*bid, error) {
+func newBid(id uuid.UUID, amount Money, acceptedTimestamp time.Time) (*Bid, error) {
 	if id == uuid.Nil {
 		return nil, fmt.Errorf("id cannot be empty")
 	}
@@ -22,7 +22,7 @@ func newBid(id uuid.UUID, amount float64, acceptedTimestamp time.Time) (*bid, er
 		return nil, fmt.Errorf("amount cannot be lower or equal to 0")
 	}
 
-	return &bid{
+	return &Bid{
 		id:                id,
 		amount:            amount,
 		acceptedTimestamp: acceptedTimestamp,

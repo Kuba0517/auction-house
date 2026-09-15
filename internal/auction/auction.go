@@ -10,14 +10,16 @@ import (
 type Auction struct {
 	id            uuid.UUID
 	productName   string
-	minIncrement  float64
-	startingPrice float64
-	buyoutPrice   float64
+	minIncrement  Money
+	startingPrice Money
+	buyoutPrice   Money
 	opened        bool
-	bids          []bid
+	bids          []Bid
 }
 
-func newAuction(id uuid.UUID, productName string, minIncrement float64, startingPrice float64, buyoutPrice float64) (*Auction, error) {
+type Money int64
+
+func newAuction(id uuid.UUID, productName string, minIncrement Money, startingPrice Money, buyoutPrice Money) (*Auction, error) {
 	if id == uuid.Nil {
 		return nil, errors.New("id cannot be empty")
 	}
@@ -45,8 +47,43 @@ func newAuction(id uuid.UUID, productName string, minIncrement float64, starting
 		startingPrice: startingPrice,
 		buyoutPrice:   buyoutPrice,
 		opened:        true,
-		bids:          []bid{},
+		bids:          []Bid{},
 	}, nil
+}
+
+func (a *Auction) PlaceBid(bid *Bid) error {
+
+	if !a.opened {
+		return ErrAuctionClosed
+	}
+
+	minimumAmount := a.startingPrice
+	if len(a.bids) > 0 {
+		previousBid := a.bids[len(a.bids)-1].amount
+		minimumAmount = previousBid + a.minIncrement
+	}
+
+	if bid.amount < minimumAmount {
+		return fmt.Errorf("%w: minimum acceptable amount is %s", ErrBidTooLow, minimumAmount)
+	}
+
+	a.bids = append(a.bids, *bid)
+
+	if bid.amount >= a.buyoutPrice {
+		a.opened = false
+	}
+
+	return nil
+}
+
+func (m Money) String() string {
+	cents := Money(m)
+
+	return fmt.Sprintf(
+		"%d.%02d",
+		cents/100,
+		cents%100,
+	)
 }
 
 func (a Auction) ID() uuid.UUID {
@@ -55,12 +92,12 @@ func (a Auction) ID() uuid.UUID {
 
 func (a Auction) String() string {
 	return fmt.Sprintf(
-		"Auction{ID: %s, Product: %q, StartingPrice: %.2f, MinIncrement: %.2f, BuyoutPrice: %.2f, Opened: %t, Bids: %d}",
+		"Auction{ID: %s, Product: %q, StartingPrice: %s, MinIncrement: %s, BuyoutPrice: %s, Opened: %t, Bids: %d}",
 		a.id.String(),
 		a.productName,
-		a.startingPrice,
-		a.minIncrement,
-		a.buyoutPrice,
+		a.startingPrice.String(),
+		a.minIncrement.String(),
+		a.buyoutPrice.String(),
 		a.opened,
 		len(a.bids),
 	)
