@@ -52,12 +52,13 @@ func handleCreate(service *auction.Service, args []string) error {
 
 	parseArgs(fs, args)
 
-	err := service.HandleCreate(*productName, *startingPrice, *minIncrement, *buyoutPrice)
+	id, err := service.HandleCreate(*productName, *startingPrice, *minIncrement, *buyoutPrice)
 
 	if err != nil {
 		return fmt.Errorf("There was a problem creating an auction: %w", err)
 	}
 
+	fmt.Println(id)
 	return nil
 }
 
