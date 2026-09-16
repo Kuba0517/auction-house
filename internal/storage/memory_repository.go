@@ -60,7 +60,7 @@ func (r *memoryRepository) Get(id uuid.UUID) (*auction.Auction, error) {
 
 	a, exists := r.auctions[id]
 	if !exists {
-		return nil, errors.New("auction not found")
+		return nil, auction.ErrAuctionNotFound
 	}
 
 	return a, nil

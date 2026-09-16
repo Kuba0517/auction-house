@@ -76,6 +76,37 @@ func (a *Auction) PlaceBid(bid *Bid) error {
 	return nil
 }
 
+func (a Auction) ID() uuid.UUID {
+	return a.id
+}
+
+func (a Auction) ProductName() string {
+	return a.productName
+}
+
+func (a Auction) StartingPrice() Money {
+	return a.startingPrice
+}
+
+func (a Auction) MinIncrement() Money {
+	return a.minIncrement
+}
+
+func (a Auction) BuyoutPrice() Money {
+	return a.buyoutPrice
+}
+
+func (a Auction) Opened() bool {
+	return a.opened
+}
+
+func (a Auction) Bids() []Bid {
+	result := make([]Bid, len(a.bids))
+	copy(result, a.bids)
+
+	return result
+}
+
 func (m Money) String() string {
 	cents := Money(m)
 
@@ -84,10 +115,6 @@ func (m Money) String() string {
 		cents/100,
 		cents%100,
 	)
-}
-
-func (a Auction) ID() uuid.UUID {
-	return a.id
 }
 
 func (a Auction) String() string {

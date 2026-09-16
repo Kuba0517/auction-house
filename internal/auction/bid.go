@@ -8,12 +8,12 @@ import (
 )
 
 type Bid struct {
-	id                uuid.UUID
-	amount            Money
-	acceptedTimestamp time.Time
+	id         uuid.UUID
+	amount     Money
+	acceptedAt time.Time
 }
 
-func newBid(id uuid.UUID, amount Money, acceptedTimestamp time.Time) (*Bid, error) {
+func newBid(id uuid.UUID, amount Money, acceptedAt time.Time) (*Bid, error) {
 	if id == uuid.Nil {
 		return nil, fmt.Errorf("id cannot be empty")
 	}
@@ -23,8 +23,20 @@ func newBid(id uuid.UUID, amount Money, acceptedTimestamp time.Time) (*Bid, erro
 	}
 
 	return &Bid{
-		id:                id,
-		amount:            amount,
-		acceptedTimestamp: acceptedTimestamp,
+		id:         id,
+		amount:     amount,
+		acceptedAt: acceptedAt,
 	}, nil
+}
+
+func (b Bid) ID() uuid.UUID {
+	return b.id
+}
+
+func (b Bid) Amount() Money {
+	return b.amount
+}
+
+func (b Bid) AcceptedAt() time.Time {
+	return b.acceptedAt
 }
